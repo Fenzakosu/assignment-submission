@@ -14,6 +14,8 @@ public class Assignment {
 
 	private String status;
 
+	private Integer assignmentNum;
+
 	private String githubUrl;
 
 	private String branch;
@@ -23,7 +25,8 @@ public class Assignment {
 	@ManyToOne(optional = false)
 	private User user;
 
-	// TODO: create private User assignedTo;
+	@ManyToOne
+	 private User codeReviewer;
 
 	public Long getId() {
 		return id;
@@ -39,6 +42,18 @@ public class Assignment {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	
+
+	
+
+	public Integer getAssignmentNum() {
+		return assignmentNum;
+	}
+
+	public void setAssignmentNum(Integer assignmentNum) {
+		this.assignmentNum = assignmentNum;
 	}
 
 	public String getGithubUrl() {
@@ -73,4 +88,13 @@ public class Assignment {
 		this.user = user;
 	}
 
+	public User getCodeReviewer() {
+		return codeReviewer;
+	}
+
+	public void setCodeReviewer(User codeReviewer) {
+		this.codeReviewer = codeReviewer;
+	}
+
+	
 }

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Button, Col, Container, Row, Form } from "react-bootstrap";
+
 import { useLocalState } from "../util/useLocalStorage";
 
 const Login = () => {
@@ -29,6 +31,7 @@ const Login = () => {
       })
       .then(([body, headers]) => {
         setJwt(headers.get("authorization"));
+        console.log(jwt);
         window.location.href = "dashboard";
       })
       .catch((message) => {
@@ -37,31 +40,61 @@ const Login = () => {
   }
 
   return (
-    <>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          type="email"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <div>
-        <button id="submit" type="button" onClick={() => sendLoginRequest()}>
-          Login
-        </button>
-      </div>
-    </>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md="8" lg="6">
+          <Form.Group className="mb-3" controlId="username">
+            <Form.Label className="fs-4">Username</Form.Label>
+            <Form.Control
+              type="email"
+              value={username}
+              placeholder="joe@gmail.com"
+              size="lg"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+      <Row className="justify-content-center">
+        <Col md="8" lg="6">
+          <Form.Group className="mb-3" controlId="password">
+            <Form.Label className="fs-4">Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={password}
+              placeholder="Type in Your Password"
+              size="lg"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+      <Row className="justify-content-center">
+        <Col
+          md="8"
+          lg="6"
+          className="mt-2 d-flex flex-column gap-4 flex-md-row justify-content-md-between"
+        >
+          <Button
+            id="submit"
+            type="button"
+            size="lg"
+            onClick={() => sendLoginRequest()}
+          >
+            Login
+          </Button>
+          <Button
+            id="submit"
+            type="button"
+            variant="secondary"
+            size="lg"
+            onClick={() => (window.location.href = "/")}
+          >
+            Exit
+          </Button>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

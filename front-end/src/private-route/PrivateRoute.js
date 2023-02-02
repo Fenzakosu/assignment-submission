@@ -1,10 +1,29 @@
 import React from "react";
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import customAjax from "../services/FetchService";
 import { useLocalState } from "../util/useLocalStorage";
 
 const PrivateRoute = ({ children }) => {
   const [jwt, setJwt] = useLocalState("", "jwt");
-  return jwt ? children : <Navigate to="/login" />;
+  const [isLoading, setIsLoading] = useState(true);
+  const [isValid, setIsValid] = useState(null);
+  if (jwt) {
+    customAjax(`/api/auth/validate?token=${jwt}`, "GET", jwt).then(
+      (isValid) => {
+        setIsValid(isValid);
+        setIsLoading(false);
+      }
+    );
+  } else {
+    return <Navigate to="/login" />;
+  }
+  return isLoading ? (
+    <div>isLoading</div>
+  ) : isValid === true ? (
+    children
+  ) : (
+    <Navigate to="/login" />
+  );
 };
-
 export default PrivateRoute;

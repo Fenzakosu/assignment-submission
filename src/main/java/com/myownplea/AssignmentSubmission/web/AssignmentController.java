@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.myownplea.AssignmentSubmission.domain.Assignment;
 import com.myownplea.AssignmentSubmission.domain.User;
+import com.myownplea.AssignmentSubmission.dto.AssignmentResponseDto;
+import com.myownplea.AssignmentSubmission.enums.AuthorityEnum;
 import com.myownplea.AssignmentSubmission.service.AssignmentService;
+import com.myownplea.AssignmentSubmission.service.UserService;
+import com.myownplea.AssignmentSubmission.util.AuthorityUtil;
 
 @RestController
 @RequestMapping("/api/assignments")
@@ -24,6 +28,9 @@ public class AssignmentController {
 
 	@Autowired
 	private AssignmentService assignmentService;
+	
+	@Autowired
+	private UserService userService;
 	
 	@PostMapping("")
 	public ResponseEntity<?> createAssignment(@AuthenticationPrincipal User user) {
@@ -34,6 +41,8 @@ public class AssignmentController {
 	
 	@GetMapping("")
 	public ResponseEntity<?> getAssignments(@AuthenticationPrincipal User user){
+		
+		
 		Set<Assignment> assignments = assignmentService.findByUser(user);
 		return ResponseEntity.ok(assignments);
 	} 
@@ -41,12 +50,24 @@ public class AssignmentController {
 	@GetMapping("{assignmentId}")
 	public ResponseEntity<?> getAssignment(@PathVariable Long assignmentId, @AuthenticationPrincipal User user){
 		Optional<Assignment> assignmentOpt = assignmentService.findById(assignmentId);
-		return ResponseEntity.ok(assignmentOpt.orElse(new Assignment()));
+		
+		
+		AssignmentResponseDto response = new AssignmentResponseDto(assignmentOpt.orElse(new Assignment()));
+		return ResponseEntity.ok(response);
 	} 
 	
 	@PutMapping("{assignmentId}")
 	public ResponseEntity<?> updateAssignment(@PathVariable Long assignmentId,
 			@RequestBody Assignment assignment,@AuthenticationPrincipal User user){
+		
+		// add the code reviewer to this assignment if it was claimed
+		User codeReviewer = assignment.getCodeReviewer();
+		if (codeReviewer != null) {
+			codeReviewer = userService.findUserByUsername(codeReviewer.getUsername()).orElse(new User());
+			if (AuthorityUtil.hasRole(AuthorityEnum.ROLE_CODE_REVIEWER.name(), codeReviewer)) {
+				assignment.setCodeReviewer(codeReviewer);
+			}
+		}
 		
 		Assignment updatedAssignment = assignmentService.save(assignment);
 		return ResponseEntity.ok(updatedAssignment);
